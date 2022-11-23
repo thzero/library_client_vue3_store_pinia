@@ -5,7 +5,7 @@
   "version_minor": 16,
   "version_patch": 8,
   "version_date": "11/22/2022",
-  "description": "An opinionated library of common functionality to bootstrap a VueJs based SPA application.",
+  "description": "An opinionated library for vue3 with pinia store for the library_client_vue3.",
   "author": "thZero",
   "license": "MIT",
   "repository": {
