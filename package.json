@@ -26,7 +26,8 @@
     "@thzero/library_client_vue3": "^0.16",
     "@thzero/library_common": "^0.16",
     "pinia": "^2.0.26",
-    "pinia-plugin-persist": "^1.0.0",
-    "vue": "^3.2.13"
+    "pinia": "^2.0.26",
+    "pinia-plugin-persistedstate-2": "^2.0.3",
+    "vue": "^3.2.45"
   }
 }
