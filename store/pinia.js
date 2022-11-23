@@ -1,5 +1,5 @@
 import { createPinia, defineStore } from 'pinia';
-import piniaPersist from 'pinia-plugin-persist';
+import { createPersistedStatePlugin } from 'pinia-plugin-persistedstate-2';
 
 import LibraryConstants from '@thzero/library_client/constants';
 
@@ -7,8 +7,8 @@ import GlobalUtility from '@thzero/library_client/utility/global';
 
 import NotImplementedError from '@thzero/library_common/errors/notImplemented';
 
-// import adminNews from './admin/news';
-// import adminUsers from './admin/users';
+// import adminNews from './admin/news/pinia';
+// import adminUsers from './admin/users/pinia';
 
 import news from './news/pinia';
 import user from './user/pinia';
@@ -17,44 +17,61 @@ class BaseStore {
 	async initialize() {
 		this.pinia = createPinia();
 
-		this.actionDispatcher = {};
-
-		const storeConfig = this._init();
-
 		const pluginPersist = this._initPluginPersist();
 		if (pluginPersist) {
-			storeConfig.persist = pluginPersist;
-			this.pinia.use(piniaPersist);
+			const installPersistedStatePlugin = createPersistedStatePlugin();
+			this.pinia.use((context) => installPersistedStatePlugin(context));
 		}
-
-		this.actionDispatcher = storeConfig.dispatcher;
-
-		const logger = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_LOGGER);
-
-		const storeFunc = defineStore('main', storeConfig);
-		GlobalUtility.$store = storeFunc(this.pinia);
-		GlobalUtility.$store.$logger = logger;
-
-		// this._addModule('adminNews', adminNews);
-		// this._addModule('adminUsers', adminUsers);
-		this._addModule('news', news, logger);
-		this._addModule('user', user, logger);
-		this._initModules();
-		GlobalUtility.$store.dispatcher = this.actionDispatcher;
-
-		console.debug(GlobalUtility);
-		console.debug(GlobalUtility.$store);
-		console.debug(GlobalUtility.$store.dispatcher);
 
 		return this.pinia;
 	}
 
-	_addModule(name, storeConfig, logger) {
-		this.actionDispatcher[name] = storeConfig.dispatcher;
+	setup() {
+		const logger = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_LOGGER);
+		return {
+			func: {
+				install(app, options) {
+					const storeConfig = options.storeConfig;
+					
+					options.actionDispatcher = storeConfig.dispatcher;
+					if (!options.actionDispatcher) 
+						options.actionDispatcher = {};
+
+					if (options.pluginPersist && options.pluginPersist['root'])
+						storeConfig.persistedState = options.pluginPersist['root'];
+
+					const storeFunc = defineStore('main', storeConfig);
+					GlobalUtility.$store = storeFunc(options.pinia);
+					GlobalUtility.$store.$logger = options.logger;
+
+					// this._addModule('adminNews', adminNews, logger);
+					// this._addModule('adminUsers', adminUsers, logger);
+					options.addModule('news', news, options.actionDispatcher, options.pluginPersist, options.pinia, logger);
+					options.addModule('user', user, options.actionDispatcher, options.pluginPersist, options.pinia, logger);
+					options.initModules();
+					GlobalUtility.$store.dispatcher = options.actionDispatcher;
+				}
+			},
+			options: {
+				actionDispatcher: this.actionDispatcher,
+				addModule: this._addModule,
+				initModules: this._initModules,
+				logger: logger,
+				pinia: this.pinia,
+				pluginPersist: this._initPluginPersist(),
+				storeConfig: this._init()
+			}
+		};
+	}
+
+	_addModule(key, storeConfig, actionDispatcher, pluginPersist, pinia, logger) {
+		if (pluginPersist && pluginPersist[key])
+			storeConfig.persistedState = pluginPersist[key];
+		actionDispatcher[key] = storeConfig.dispatcher;
 		delete storeConfig.dispatcher;
-		const storeFunc = defineStore(name, storeConfig);
-		GlobalUtility.$store[name] = storeFunc(this.pinia);
-		GlobalUtility.$store[name].$logger = logger;
+		const storeFunc = defineStore(key, storeConfig);
+		GlobalUtility.$store[key] = storeFunc(pinia);
+		GlobalUtility.$store[key].$logger = logger;
 	}
 
 	_init() {
