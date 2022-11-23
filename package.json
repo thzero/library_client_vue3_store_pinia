@@ -1,9 +1,9 @@
 {
   "name": "@thzero/library_client_vue3_store_pinia",
-  "version": "0.16.9",
+  "version": "0.16.10",
   "version_major": 0,
   "version_minor": 16,
-  "version_patch": 9,
+  "version_patch": 10,
   "version_date": "11/23/2022",
   "description": "An opinionated library of common functionality to bootstrap a VueJs based SPA application.",
   "author": "thZero",
