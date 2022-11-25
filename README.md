@@ -4,6 +4,6 @@
 
 # library_client_vue3_store_pinia
 
-An opinionated library for vue3 with pinia store for the library_client_vue3.
+An opinionated library for vue3 with pinia store for the library_client_vue3 using the [https://prazdevs.github.io/pinia-plugin-persistedstate](https://prazdevs.github.io/pinia-plugin-persistedstate) library.
 
 [![NPM](https://nodei.co/npm/@thzero/library_common.png?compact=true)](https://npmjs.org/package/@thzero/library_client_vue3_store_pinia)
