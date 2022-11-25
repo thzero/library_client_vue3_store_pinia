@@ -1,5 +1,5 @@
 import { createPinia, defineStore } from 'pinia';
-import { createPersistedStatePlugin } from 'pinia-plugin-persistedstate-2';
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
 import LibraryConstants from '@thzero/library_client/constants';
 
@@ -19,8 +19,7 @@ class BaseStore {
 
 		const pluginPersist = this._initPluginPersist();
 		if (pluginPersist) {
-			const installPersistedStatePlugin = createPersistedStatePlugin();
-			this.pinia.use((context) => installPersistedStatePlugin(context));
+			this.pinia.use(piniaPluginPersistedstate);
 		}
 
 		return this.pinia;
@@ -38,14 +37,14 @@ class BaseStore {
 						options.actionDispatcher = {};
 
 					if (options.pluginPersist && options.pluginPersist['root'])
-						storeConfig.persistedState = options.pluginPersist['root'];
+						storeConfig.persist = options.pluginPersist['root'];
 
 					const storeFunc = defineStore('main', storeConfig);
 					GlobalUtility.$store = storeFunc(options.pinia);
 					GlobalUtility.$store.$logger = options.logger;
 
-					// this._addModule('adminNews', adminNews, logger);
-					// this._addModule('adminUsers', adminUsers, logger);
+					// options.addModule('adminNews', adminNews, options.actionDispatcher, options.pluginPersist, options.pinia, logger);
+					// options.addModule('adminUsers', adminUsers, options.actionDispatcher, options.pluginPersist, options.pinia, logger);
 					options.addModule('news', news, options.actionDispatcher, options.pluginPersist, options.pinia, logger);
 					options.addModule('user', user, options.actionDispatcher, options.pluginPersist, options.pinia, logger);
 					options.initModules();
@@ -66,7 +65,7 @@ class BaseStore {
 
 	_addModule(key, storeConfig, actionDispatcher, pluginPersist, pinia, logger) {
 		if (pluginPersist && pluginPersist[key])
-			storeConfig.persistedState = pluginPersist[key];
+			storeConfig.persist = pluginPersist[key];
 		actionDispatcher[key] = storeConfig.dispatcher;
 		delete storeConfig.dispatcher;
 		const storeFunc = defineStore(key, storeConfig);
