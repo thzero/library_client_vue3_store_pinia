@@ -14,6 +14,10 @@ class PiniaStoreService extends Service {
 	get state() {
 		return GlobalUtility.$store;
 	}
+
+	get user() {
+		return GlobalUtility.$store.user;
+	}
 }
 
 export default PiniaStoreService;
