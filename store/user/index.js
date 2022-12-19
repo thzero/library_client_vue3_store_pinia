@@ -10,6 +10,7 @@ const store = {
 		authCompleted: false,
 		claims: null,
 		isLoggedIn: false,
+		theme: 'defaultTheme',
 		token: null,
 		tokenResult: null,
 		user: null
@@ -63,7 +64,10 @@ const store = {
 			}
 			return response;
 		},
-		async setUserTokenResult(correlationId, tokenResult) {
+		async setTheme(correlationId, isLoggedIn) {
+			this.theme = theme;
+		},
+		async setTokenResult(correlationId, tokenResult) {
 			this.$patch({
 				tokenResult: null,
 				token: tokenResult ? tokenResult.token : null
@@ -96,17 +100,21 @@ const store = {
 			// await GlobalUtility.$store.dispatch('setUserLoggedIn', { correlationId: correlationId, isLoggedIn: isLoggedIn });
 			await GlobalUtility.$store.user.setUserLoggedIn(correlationId, isLoggedIn);
 		},
-		async setUserSettings(correlationId, settings) {
-			// return await GlobalUtility.$store.dispatch('setUserSettings', { correlationId: correlationId, settings: settings });
-			await GlobalUtility.$store.user.setUserSettings(correlationId, settings);
+		async setTheme(correlationId, theme) {
+			// await GlobalUtility.$store.dispatch('setTheme', { correlationId: correlationId, tokenResult: tokenResult });
+			await GlobalUtility.$store.user.setTheme(correlationId, theme);
 		},
 		async setTokenResult(correlationId, tokenResult) {
-			// await GlobalUtility.$store.dispatch('setUserTokenResult', { correlationId: correlationId, tokenResult: tokenResult });
-			await GlobalUtility.$store.user.setUserTokenResult(correlationId, tokenResult);
+			// await GlobalUtility.$store.dispatch('setTokenResult', { correlationId: correlationId, tokenResult: tokenResult });
+			await GlobalUtility.$store.user.setTokenResult(correlationId, tokenResult);
 		},
 		async setUser(correlationId, user) {
 			// await GlobalUtility.$store.dispatch('setUser', { correlationId: correlationId, user: user });
 			await GlobalUtility.$store.user.setUser(correlationId, user);
+		},
+		async setUserSettings(correlationId, settings) {
+			// return await GlobalUtility.$store.dispatch('setUserSettings', { correlationId: correlationId, settings: settings });
+			await GlobalUtility.$store.user.setUserSettings(correlationId, settings);
 		}
 	}
 };

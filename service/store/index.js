@@ -16,7 +16,31 @@ class PiniaStoreService extends Service {
 	}
 
 	get user() {
-		return GlobalUtility.$store.user;
+		return GlobalUtility.$store.user.user;
+	}
+	
+	get userClaims() {
+		return GlobalUtility.$store.user.claims;
+	}
+	
+	get userToken() {
+		return GlobalUtility.$store.user.token;
+	}
+	
+	get userAuthCompleted() {
+		return GlobalUtility.$store.user.authCompleted;
+	}
+	
+	get userAuthIsLoggedIn() {
+		return GlobalUtility.$store.user.isLoggedIn;
+	}
+	
+	get userTheme() {
+		return GlobalUtility.$store.user.theme;
+	}
+	
+	get userTokenResult() {
+		return GlobalUtility.$store.user.tokenResult;
 	}
 }
 
