@@ -42,32 +42,28 @@ const store = {
 		async setUserLoggedIn(correlationId, isLoggedIn) {
 			this.isLoggedIn = isLoggedIn;
 		},
+		// async setUserSettings(correlationId, settings) {
+		// 	const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_USER);
+		// 	settings = VueUtility.settings().mergeUser(correlationId, settings);
+		// 	const response = await service.updateSettings(correlationId, this.user, settings);
+		// 	this.$logger.debug('store.user', 'setUserSettings', 'response', response);
+		// 	if (Response.hasSucceeded(response) && response.results)
+		// 		this.setUser(correlationId, response.results);
+		// 	return response;
+		// },
 		async setUserSettings(correlationId, settings) {
 			const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_USER);
-			settings = VueUtility.settings().mergeUser(params.correlationId, settings);
-			const response = await service.updateSettings(params.correlationId, this.user, settings);
+			settings = VueUtility.settings().mergeUser(correlationId, settings);
+			const response = await service.updateSettings(correlationId, this.user, settings);
 			this.$logger.debug('store.user', 'setUserSettings', 'response', response);
 			if (Response.hasSucceeded(response) && response.results)
-				this.setUser(correlationId, response.results);
+				this.user = response.results;
 			return response;
 		},
-		async setUserSettings2(correlationId, settings) {
-			const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_USER);
-			settings = VueUtility.settings().mergeUser(params.correlationId, settings);
-			const response = await service.updateSettings(params.correlationId, this.user, settings);
-			this.$logger.debug('store.user', 'setUserSettings', 'response', response);
-			if (Response.hasSucceeded(response) && response.results) {
-				// commit('setUserSettings', { correlationId: params.correlationId, user: response.results });
-				const user = response.results;
-				user.settings = VueUtility.settings().mergeUser(correlationId, user.settings);
-				this.user = user;
-			}
-			return response;
-		},
-		async setTheme(correlationId, isLoggedIn) {
+		async setUserTheme(correlationId, isLoggedIn) {
 			this.theme = theme;
 		},
-		async setTokenResult(correlationId, tokenResult) {
+		async setUserTokenResult(correlationId, tokenResult) {
 			this.$patch({
 				tokenResult: null,
 				token: tokenResult ? tokenResult.token : null
@@ -79,42 +75,48 @@ const store = {
 			this.user = user;
 		}
 	},
+	getters: {
+		getUser (correlationId) {
+			return GlobalUtility.$store.user.user;
+		},
+		getUserTheme (correlationId) {
+			return GlobalUtility.$store.theme;
+		},
+		getUserSettings(correlationId) {
+			if (GlobalUtility.$store.user.user && GlobalUtility.$store.user.user.settings)
+				return GlobalUtility.$store.user.user.settings;
+
+			const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_USER);
+			return service.initializeSettings();
+		}
+	},
 	dispatcher: {
 		async refreshUserSettings(correlationId) {
-			// await GlobalUtility.$store.dispatch('refreshUserSettings', correlationId);
-			await GlobalUtility.$store.user.refreshUserSettings(correlationId);
+			return await GlobalUtility.$store.user.refreshUserSettings(correlationId);
 		},
 		async resetUser(correlationId) {
-			// await GlobalUtility.$store.dispatch('resetUser', correlationId);
 			await GlobalUtility.$store.user.resetUser(correlationId);
 		},
-		async setAuthCompleted(correlationId, authCompleted) {
-			// await GlobalUtility.$store.dispatch('setUserAuthCompleted', { correlationId: correlationId, authCompleted: authCompleted });
+		async setUserAuthCompleted(correlationId, authCompleted) {
 			await GlobalUtility.$store.user.setUserAuthCompleted(correlationId, authCompleted);
 		},
-		async setClaims(correlationId, claims) {
-			// await GlobalUtility.$store.dispatch('setUserClaims', { correlationId: correlationId, authCompleted: claims });
+		async setUserClaims(correlationId, claims) {
 			await GlobalUtility.$store.user.setUserClaims(correlationId, claims);
 		},
-		async setLoggedIn(correlationId, isLoggedIn) {
-			// await GlobalUtility.$store.dispatch('setUserLoggedIn', { correlationId: correlationId, isLoggedIn: isLoggedIn });
+		async setUserLoggedIn(correlationId, isLoggedIn) {
 			await GlobalUtility.$store.user.setUserLoggedIn(correlationId, isLoggedIn);
 		},
-		async setTheme(correlationId, theme) {
-			// await GlobalUtility.$store.dispatch('setTheme', { correlationId: correlationId, tokenResult: tokenResult });
-			await GlobalUtility.$store.user.setTheme(correlationId, theme);
+		async setUserSettings(correlationId, settings) {
+			return await GlobalUtility.$store.user.setUserSettings(correlationId, settings);
 		},
-		async setTokenResult(correlationId, tokenResult) {
-			// await GlobalUtility.$store.dispatch('setTokenResult', { correlationId: correlationId, tokenResult: tokenResult });
-			await GlobalUtility.$store.user.setTokenResult(correlationId, tokenResult);
+		async setUserTheme(correlationId, theme) {
+			await GlobalUtility.$store.user.setUserTheme(correlationId, theme);
+		},
+		async setUserTokenResult(correlationId, tokenResult) {
+			await GlobalUtility.$store.user.setUserTokenResult(correlationId, tokenResult);
 		},
 		async setUser(correlationId, user) {
-			// await GlobalUtility.$store.dispatch('setUser', { correlationId: correlationId, user: user });
 			await GlobalUtility.$store.user.setUser(correlationId, user);
-		},
-		async setUserSettings(correlationId, settings) {
-			// return await GlobalUtility.$store.dispatch('setUserSettings', { correlationId: correlationId, settings: settings });
-			await GlobalUtility.$store.user.setUserSettings(correlationId, settings);
 		}
 	}
 };

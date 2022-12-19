@@ -8,7 +8,7 @@ class PiniaStoreService extends Service {
 	}
 
 	get getters() {
-		return GlobalUtility.$store;
+		return GlobalUtility.$store.getters;
 	}
 
 	get state() {
