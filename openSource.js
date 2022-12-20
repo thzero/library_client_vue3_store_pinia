@@ -42,5 +42,12 @@ export default () => {
             licenseName: 'MIT',
             licenseUrl: 'https://github.com/iendeavor/pinia-plugin-persistedstate-2/blob/main/LICENSE'
         },
+        {
+            category: 'client',
+            name: 'vue',
+            url: 'https://github.com/vuejs/core',
+            licenseName: 'MIT',
+            licenseUrl: 'https://github.com/vuejs/core/blob/main/LICENSE'
+        }
     ];
 }
