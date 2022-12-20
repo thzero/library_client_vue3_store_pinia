@@ -6,6 +6,8 @@ import LibraryConstants from '@thzero/library_client/constants';
 
 import GlobalUtility from '@thzero/library_client/utility/global';
 
+import Response from '@thzero/library_common/response';
+
 import NotImplementedError from '@thzero/library_common/errors/notImplemented';
 
 // import adminNews from './admin/news/pinia';
@@ -158,22 +160,55 @@ class BaseStore {
 		return {
 			state: () => ({
 				checksumLastUpdate: [],
+				openSource: [],
 				plans: [],
 				version: null
 			}),
 			actions: {
-				async getPlans(correlationId) {
+				async requestOpenSource(correlationId) {
+					const openSourceCheck = GlobalUtility.$store.openSource;
+					if (openSourceCheck && Array.isArray(openSourceCheck) && openSourceCheck.length > 0)
+						return Response.success(openSourceCheck);
+
+					const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_UTILITY);
+					const response = await service.openSource(correlationId);
+					this.$logger.debug('store', 'requestOpenSource', 'response', response, correlationId);
+					const openSource = response.results ? response.results : null;
+					if (Response.hasFailed(response))
+						return response;
+					this.setOpenSource(correlationId, openSource);
+					return Response.success(correlationId, openSource);
+				},
+				async requestPlans(correlationId) {
 					const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_PLANS);
 					const response = await service.plans(correlationId);
-					this.$logger.debug('store', 'getPlans', 'response', response, correlationId);
+					this.$logger.debug('store', 'requestPlans', 'response', response, correlationId);
+					const plans = response.results ? response.results.data : [];
+					if (Response.hasFailed(response))
+						return response;
+					this.setPlans(correlationId, plans);
+					return Response.success(plans);
+				},
+				async initialize(correlationId) {
+					const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_UTILITY);
+					const response = await service.initialize(correlationId);
 					if (Response.hasSucceeded(response)) {
-						this.setPlans(correlationId, response.results ? response.results.data : []);
+						this.setPlans(correlationId, response.results.plans);
+						this.setVersion(correlationId, response.results.version);
+						if (this._initialize)
+							this._intialize(correlationId, response.results);
 					}
 				},
 				async requestVersion(correlationId) {
 					const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_VERSION);
 					const version = await service.version(correlationId);
 					this.setVersion(correlationId, version);
+				},
+				async setOpenSource(correlationId, openSource) {
+					this.$logger.debug('store', 'setOpenSource', 'openSource.a', openSource, correlationId);
+					this.$logger.debug('store', 'setOpenSource', 'openSource.b', this.openSource, correlationId);
+					this.openSource = openSource;
+					this.$logger.debug('store', 'setOpenSource', 'openSource.c', this.openSource, correlationId);
 				},
 				async setPlans(correlationId, plans) {
 					this.$logger.debug('store', 'setPlans', 'plans.a', plans, correlationId);
@@ -189,15 +224,21 @@ class BaseStore {
 				}
 			},
 			getters: {
-				getPlan (correlationId, id) {
+				getOpenSource(correlationId) {
+					return GlobalUtility.$store.openSource;
+				},
+				getPlan(correlationId, id) {
 					if (GlobalUtility.$store.plans == null)
 						return null;
 					return GlobalUtility.$store.plans.find(plan => plan.id === id);
 				}
 			},
 			dispatcher: {
-				async getPlans(correlationId) {
-					await GlobalUtility.$store.getPlans(correlationId);
+				async requestOpenSource(correlationId) {
+					return await GlobalUtility.$store.requestOpenSource(correlationId);
+				},
+				async requestPlans(correlationId) {
+					return await GlobalUtility.$store.requestPlans(correlationId);
 				},
 				async requestVersion(correlationId) {
 					await GlobalUtility.$store.requestVersion(correlationId);
