@@ -168,7 +168,7 @@ class BaseStore {
 				async requestOpenSource(correlationId) {
 					const openSourceCheck = GlobalUtility.$store.openSource;
 					if (openSourceCheck && Array.isArray(openSourceCheck) && openSourceCheck.length > 0)
-						return Response.success(openSourceCheck);
+						return Response.success(correlationId, openSourceCheck);
 
 					const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_UTILITY);
 					const response = await service.openSource(correlationId);
