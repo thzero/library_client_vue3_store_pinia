@@ -45,9 +45,9 @@ export default () => {
         {
             category: 'client',
             name: 'vue',
-            url: 'https://github.com/vuejs/core',
+            url: 'https://github.com/vuejs/vue',
             licenseName: 'MIT',
-            licenseUrl: 'https://github.com/vuejs/core/blob/main/LICENSE'
+            licenseUrl: 'https://github.com/vuejs/vue/blob/dev/LICENSE'
         }
     ];
 }
