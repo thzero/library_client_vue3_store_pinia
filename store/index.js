@@ -165,6 +165,16 @@ class BaseStore {
 				version: null
 			}),
 			actions: {
+				async initialize(correlationId) {
+					const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_UTILITY);
+					const response = await service.initialize(correlationId);
+					if (Response.hasSucceeded(response)) {
+						await this.setPlans(correlationId, response.results.plans);
+						await this.setVersion(correlationId, response.results.version);
+						if (this._initialize)
+							await this._initialize(correlationId, response.results);
+					}
+				},
 				async requestOpenSource(correlationId) {
 					const openSourceCheck = GlobalUtility.$store.openSource;
 					if (openSourceCheck && Array.isArray(openSourceCheck) && openSourceCheck.length > 0)
@@ -176,7 +186,7 @@ class BaseStore {
 					const openSource = response.results ? response.results : null;
 					if (Response.hasFailed(response))
 						return response;
-					this.setOpenSource(correlationId, openSource);
+					await this.setOpenSource(correlationId, openSource);
 					return Response.success(correlationId, openSource);
 				},
 				async requestPlans(correlationId) {
@@ -186,23 +196,13 @@ class BaseStore {
 					const plans = response.results ? response.results.data : [];
 					if (Response.hasFailed(response))
 						return response;
-					this.setPlans(correlationId, plans);
+					await this.setPlans(correlationId, plans);
 					return Response.success(plans);
-				},
-				async initialize(correlationId) {
-					const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_UTILITY);
-					const response = await service.initialize(correlationId);
-					if (Response.hasSucceeded(response)) {
-						this.setPlans(correlationId, response.results.plans);
-						this.setVersion(correlationId, response.results.version);
-						if (this._initialize)
-							this._intialize(correlationId, response.results);
-					}
 				},
 				async requestVersion(correlationId) {
 					const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_VERSION);
 					const version = await service.version(correlationId);
-					this.setVersion(correlationId, version);
+					await this.setVersion(correlationId, version);
 				},
 				async setOpenSource(correlationId, openSource) {
 					this.$logger.debug('store', 'setOpenSource', 'openSource.a', openSource, correlationId);
