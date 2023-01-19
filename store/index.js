@@ -4,6 +4,7 @@ import { createPersistedStatePlugin } from 'pinia-plugin-persistedstate-2';
 
 import LibraryConstants from '@thzero/library_client/constants';
 
+import Utility from '@thzero/library_common/utility/index';
 import GlobalUtility from '@thzero/library_client/utility/global';
 
 import Response from '@thzero/library_common/response';
@@ -49,18 +50,30 @@ class BaseStore {
 					if (!options.actionDispatcher) 
 						options.actionDispatcher = {};
 
-					if (options.pluginPersistSetup && options.pluginPersistType && options.pluginPersistConfig && options.pluginPersistConfig['root'])
-						options.pluginPersistSetup(options.pluginPersistType(), storeConfig, options.pluginPersistConfig['root'], options.pluginPersistSetupOverride);
+					const pluginPersistType = options.pluginPersistType();
+					const additionalPaths = storeConfig.pluginPersistPaths ? storeConfig.pluginPersistPaths[pluginPersistType] : null;
+
+					if (options.pluginPersistSetup && options.pluginPersistType && options.pluginPersistConfig && options.pluginPersistConfig && options.pluginPersistConfig[pluginPersistType])
+						options.pluginPersistSetup(pluginPersistType, storeConfig, options.pluginPersistConfig[pluginPersistType], options.pluginPersistSetupOverride, {
+							additionalPaths: additionalPaths
+						});
+						
+					// if (storeConfig.pluginPersistPaths && storeConfig.pluginPersistPaths[pluginPersistType])
+					// 	storeConfig[pluginPersistType].paths = [ ...storeConfig[pluginPersistType].paths, ...storeConfig.pluginPersistPaths[pluginPersistType] ];
+					delete storeConfig.pluginPersistPaths;
 
 					const storeFunc = defineStore('main', storeConfig);
 					GlobalUtility.$store = storeFunc(options.pinia);
 					GlobalUtility.$store.$logger = options.logger;
 
-					// options.addModule('adminNews', adminNews, options.actionDispatcher, options.pluginPersistType(), options.pluginPersistConfig, options.pinia, logger);
-					// options.addModule('adminUsers', adminUsers, options.actionDispatcher, options.pluginPersistType(), options.pluginPersistConfig, options.pinia, logger);
-					options.addModule('news', news, options.actionDispatcher, options.actionGetters, options.pluginPersistType(), options.pluginPersistSetup, options.pluginPersistConfig, options.pluginPersistSetupOverride, options.pinia, logger);
-					options.addModule('user', user, options.actionDispatcher, options.actionGetters, options.pluginPersistType(), options.pluginPersistSetup, options.pluginPersistConfig, options.pluginPersistSetupOverride, options.pinia, logger);
-					options.initModules();
+					const storeFuncModules = [];
+					// options.addModule('adminNews', adminNews, options.actionDispatcher, pluginPersistType, options.pluginPersistConfig, options.pinia, logger);
+					// options.addModule('adminUsers', adminUsers, options.actionDispatcher, pluginPersistType, options.pluginPersistConfig, options.pinia, logger);
+					storeFuncModules.push(options.addModule('news', news, options.actionDispatcher, options.actionGetters, storeConfig.persist, pluginPersistType, options.pluginPersistSetup, options.pluginPersistSetupOverride, options.pinia, logger));
+					storeFuncModules.push(options.addModule('user', user, options.actionDispatcher, options.actionGetters, storeConfig.persist, pluginPersistType, options.pluginPersistSetup, options.pluginPersistSetupOverride, options.pinia, logger));
+
+					storeFuncModules.push(...options.initModules());
+
 					GlobalUtility.$store.dispatcher = options.actionDispatcher;
 					GlobalUtility.$store.getters = options.actionGetters;
 				}
@@ -81,20 +94,27 @@ class BaseStore {
 		};
 	}
 
-	_addModule(key, storeConfig, actionDispatcher, actionGetters, pluginPersistType, pluginPersistSetup, pluginPersistConfig, pluginPersistSetupOverride, pinia, logger) {
-		if (pluginPersistType && pluginPersistSetup && pluginPersistConfig && pluginPersistConfig[key])
-			pluginPersistSetup(pluginPersistType, storeConfig, pluginPersistConfig['root'], pluginPersistSetupOverride);
+	_addModule(key, storeConfig, actionDispatcher, actionGetters, pluginPersistConfig, pluginPersistType, pluginPersistSetup, pluginPersistSetupOverride, pinia, logger) {
+		if (pluginPersistType && pluginPersistSetup && storeConfig.pluginPersistPaths && storeConfig.pluginPersistPaths[pluginPersistType]) {
+			pluginPersistConfig = Utility.cloneDeep(pluginPersistConfig);
+			pluginPersistSetup(pluginPersistType, storeConfig, pluginPersistConfig, pluginPersistSetupOverride, {
+				additionalPaths: storeConfig.pluginPersistPaths[pluginPersistType],
+				keySuffix: `_${key}`
+			});
+		}
 		actionDispatcher[key] = storeConfig.dispatcher;
 		delete storeConfig.dispatcher;
 		actionGetters[key] = storeConfig.getters;
 		delete storeConfig.getters;
+		delete storeConfig.pluginPersistPaths;
 		const storeFunc = defineStore(key, storeConfig);
 		GlobalUtility.$store[key] = storeFunc(pinia);
 		GlobalUtility.$store[key].$logger = logger;
+		return { key: key, storeFunc: storeFunc };
 	}
 
 	_initModules() {
-		throw new NotImplementedError();
+		return [];
 	}
 
 	_initPluginPersist() {
@@ -130,12 +150,24 @@ class BaseStore {
 		return BaseStore.PersistanceTypePersist;
 	}
 
-	_initPluginPersistConfigSetup(type, storeConfig, persistConfig, override) {
+	_initPluginPersistConfigSetup(type, storeConfig, persistConfig, override, options) {
 		if (type === BaseStore.PersistanceTypePersist) {
+			if (options && !String.isNullOrEmpty(options.keyOverride))
+				persistConfig.key = options.keyOverride;
+			if (options && !String.isNullOrEmpty(options.keySuffix))
+				persistConfig.key += options.keySuffix;
+			if (options && options.additionalPaths)
+				persistConfig.paths = [ ...persistConfig.paths, ...options.additionalPaths ];
 			storeConfig.persist = persistConfig;
 			return;
 		}
 		if (type === BaseStore.PersistanceTypePersist2) {
+			if (options && !String.isNullOrEmpty(options.keyOverride))
+				persistConfig.key = options.keyOverride;
+			if (options && !String.isNullOrEmpty(options.keySuffix))
+				persistConfig.key += options.keySuffix;
+			if (options && options.additionalPaths)
+				persistConfig.includePaths = [ ...persistConfig.includePaths, ...options.additionalPaths ];
 			storeConfig.persistedState = persistConfig;
 			return;
 		}
@@ -158,6 +190,13 @@ class BaseStore {
 
 	_initStoreConfigBase() {
 		return {
+			pluginPersistPaths: {
+				persist: [
+					'openSource',
+					'plans',
+					'version'
+				]
+			},
 			state: () => ({
 				checksumLastUpdate: [],
 				openSource: [],

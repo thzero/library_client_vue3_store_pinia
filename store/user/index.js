@@ -6,6 +6,11 @@ import VueUtility from '@thzero/library_client_vue3/utility';
 import Response from '@thzero/library_common/response';
 
 const store = {
+	pluginPersistPaths: {
+		persist: [
+			'user'
+		]
+	},
 	state: () => ({
 		authCompleted: false,
 		claims: null,
@@ -74,7 +79,7 @@ const store = {
 			return GlobalUtility.$store.theme;
 		},
 		getUserSettings(correlationId) {
-			if (GlobalUtility.$store.user.user && GlobalUtility.$store.user.user.settings)
+			if (GlobalUtility.$store.user.user && GlobalUtility.$store.user.user.settings) // TODO: userRef
 				return GlobalUtility.$store.user.user.settings;
 
 			const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_USER);

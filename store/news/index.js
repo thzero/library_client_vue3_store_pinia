@@ -3,6 +3,11 @@ import LibraryConstants from '@thzero/library_client/constants';
 import GlobalUtility from '@thzero/library_client/utility/global';
 
 const store = {
+	pluginPersistPaths: {
+		persist: [
+			'news'
+		]
+	},
 	state: () => ({
 		latest: null
 	}),
