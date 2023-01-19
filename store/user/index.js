@@ -42,15 +42,6 @@ const store = {
 		async setUserLoggedIn(correlationId, isLoggedIn) {
 			this.isLoggedIn = isLoggedIn;
 		},
-		// async setUserSettings(correlationId, settings) {
-		// 	const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_USER);
-		// 	settings = VueUtility.settings().mergeUser(correlationId, settings);
-		// 	const response = await service.updateSettings(correlationId, this.user, settings);
-		// 	this.$logger.debug('store.user', 'setUserSettings', 'response', response);
-		// 	if (Response.hasSucceeded(response) && response.results)
-		// 		this.setUser(correlationId, response.results);
-		// 	return response;
-		// },
 		async setUserSettings(correlationId, settings) {
 			const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_USER);
 			settings = VueUtility.settings().mergeUser(correlationId, settings);
