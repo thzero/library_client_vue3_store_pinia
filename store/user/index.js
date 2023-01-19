@@ -6,6 +6,11 @@ import VueUtility from '@thzero/library_client_vue3/utility';
 import Response from '@thzero/library_common/response';
 
 const store = {
+	pluginPersistPaths: {
+		persist: [
+			'user'
+		]
+	},
 	state: () => ({
 		authCompleted: false,
 		claims: null,
@@ -42,15 +47,6 @@ const store = {
 		async setUserLoggedIn(correlationId, isLoggedIn) {
 			this.isLoggedIn = isLoggedIn;
 		},
-		// async setUserSettings(correlationId, settings) {
-		// 	const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_USER);
-		// 	settings = VueUtility.settings().mergeUser(correlationId, settings);
-		// 	const response = await service.updateSettings(correlationId, this.user, settings);
-		// 	this.$logger.debug('store.user', 'setUserSettings', 'response', response);
-		// 	if (Response.hasSucceeded(response) && response.results)
-		// 		this.setUser(correlationId, response.results);
-		// 	return response;
-		// },
 		async setUserSettings(correlationId, settings) {
 			const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_USER);
 			settings = VueUtility.settings().mergeUser(correlationId, settings);
@@ -83,7 +79,7 @@ const store = {
 			return GlobalUtility.$store.theme;
 		},
 		getUserSettings(correlationId) {
-			if (GlobalUtility.$store.user.user && GlobalUtility.$store.user.user.settings)
+			if (GlobalUtility.$store.user.user && GlobalUtility.$store.user.user.settings) // TODO: userRef
 				return GlobalUtility.$store.user.user.settings;
 
 			const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_USER);
