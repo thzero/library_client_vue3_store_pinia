@@ -2,10 +2,10 @@ import { createPinia, defineStore } from 'pinia';
 import piniaPluginPersistedState from 'pinia-plugin-persistedstate';
 import { createPersistedStatePlugin } from 'pinia-plugin-persistedstate-2';
 
-import LibraryConstants from '@thzero/library_client/constants';
+import LibraryClientConstants from '@thzero/library_client/constants';
 
-import Utility from '@thzero/library_common/utility/index';
-import GlobalUtility from '@thzero/library_client/utility/global';
+import LibraryClientUtility from '@thzero/library_client/utility/index';
+import LibraryCommonUtility from '@thzero/library_common/utility/index';
 
 import Response from '@thzero/library_common/response';
 
@@ -27,7 +27,7 @@ class BaseStore {
 	}
 
 	setup() {
-		const logger = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_LOGGER);
+		const logger = LibraryClientUtility.$injector.getService(LibraryClientConstants.InjectorKeys.SERVICE_LOGGER);
 
 		const initialStoreConfig = this._initStoreConfigBase();
 		const appStoreConfig = this._initStoreConfig();
@@ -63,8 +63,8 @@ class BaseStore {
 					delete storeConfig.pluginPersistPaths;
 
 					const storeFunc = defineStore('main', storeConfig);
-					GlobalUtility.$store = storeFunc(options.pinia);
-					GlobalUtility.$store.$logger = options.logger;
+					LibraryClientUtility.$store = storeFunc(options.pinia);
+					LibraryClientUtility.$store.$logger = options.logger;
 
 					const storeFuncModules = [];
 					// options.addModule('adminNews', adminNews, options.actionDispatcher, pluginPersistType, options.pluginPersistConfig, options.pinia, logger);
@@ -74,8 +74,8 @@ class BaseStore {
 
 					storeFuncModules.push(...options.initModules());
 
-					GlobalUtility.$store.dispatcher = options.actionDispatcher;
-					GlobalUtility.$store.getters = options.actionGetters;
+					LibraryClientUtility.$store.dispatcher = options.actionDispatcher;
+					LibraryClientUtility.$store.getters = options.actionGetters;
 				}
 			},
 			options: {
@@ -96,7 +96,7 @@ class BaseStore {
 
 	_addModule(key, storeConfig, actionDispatcher, actionGetters, pluginPersistConfig, pluginPersistType, pluginPersistSetup, pluginPersistSetupOverride, pinia, logger) {
 		if (pluginPersistType && pluginPersistSetup && storeConfig.pluginPersistPaths && storeConfig.pluginPersistPaths[pluginPersistType]) {
-			pluginPersistConfig = Utility.cloneDeep(pluginPersistConfig);
+			pluginPersistConfig = LibraryCommonUtility.cloneDeep(pluginPersistConfig);
 			pluginPersistSetup(pluginPersistType, storeConfig, pluginPersistConfig, pluginPersistSetupOverride, {
 				additionalPaths: storeConfig.pluginPersistPaths[pluginPersistType],
 				keySuffix: `_${key}`
@@ -108,8 +108,8 @@ class BaseStore {
 		delete storeConfig.getters;
 		delete storeConfig.pluginPersistPaths;
 		const storeFunc = defineStore(key, storeConfig);
-		GlobalUtility.$store[key] = storeFunc(pinia);
-		GlobalUtility.$store[key].$logger = logger;
+		LibraryClientUtility.$store[key] = storeFunc(pinia);
+		LibraryClientUtility.$store[key].$logger = logger;
 		return { key: key, storeFunc: storeFunc };
 	}
 
@@ -205,7 +205,7 @@ class BaseStore {
 			}),
 			actions: {
 				async initialize(correlationId) {
-					const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_UTILITY);
+					const service = LibraryClientUtility.$injector.getService(LibraryClientConstants.InjectorKeys.SERVICE_UTILITY);
 					const response = await service.initialize(correlationId);
 					if (Response.hasSucceeded(response)) {
 						await this.setPlans(correlationId, response.results.plans);
@@ -215,11 +215,11 @@ class BaseStore {
 					}
 				},
 				async requestOpenSource(correlationId) {
-					const openSourceCheck = GlobalUtility.$store.openSource;
+					const openSourceCheck = LibraryClientUtility.$store.openSource;
 					if (openSourceCheck && Array.isArray(openSourceCheck) && openSourceCheck.length > 0)
 						return Response.success(correlationId, openSourceCheck);
 
-					const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_UTILITY);
+					const service = LibraryClientUtility.$injector.getService(LibraryClientConstants.InjectorKeys.SERVICE_UTILITY);
 					const response = await service.openSource(correlationId);
 					this.$logger.debug('store', 'requestOpenSource', 'response', response, correlationId);
 					const openSource = response.results ? response.results : null;
@@ -229,7 +229,7 @@ class BaseStore {
 					return Response.success(correlationId, openSource);
 				},
 				async requestPlans(correlationId) {
-					const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_PLANS);
+					const service = LibraryClientUtility.$injector.getService(LibraryClientConstants.InjectorKeys.SERVICE_PLANS);
 					const response = await service.plans(correlationId);
 					this.$logger.debug('store', 'requestPlans', 'response', response, correlationId);
 					const plans = response.results ? response.results.data : [];
@@ -239,7 +239,7 @@ class BaseStore {
 					return Response.success(plans);
 				},
 				async requestVersion(correlationId) {
-					const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_VERSION);
+					const service = LibraryClientUtility.$injector.getService(LibraryClientConstants.InjectorKeys.SERVICE_VERSION);
 					const version = await service.version(correlationId);
 					await this.setVersion(correlationId, version);
 				},
@@ -264,26 +264,26 @@ class BaseStore {
 			},
 			getters: {
 				getOpenSource(correlationId) {
-					return GlobalUtility.$store.openSource;
+					return LibraryClientUtility.$store.openSource;
 				},
 				getPlan(correlationId, id) {
-					if (GlobalUtility.$store.plans == null)
+					if (LibraryClientUtility.$store.plans == null)
 						return null;
-					return GlobalUtility.$store.plans.find(plan => plan.id === id);
+					return LibraryClientUtility.$store.plans.find(plan => plan.id === id);
 				}
 			},
 			dispatcher: {
 				async requestOpenSource(correlationId) {
-					return await GlobalUtility.$store.requestOpenSource(correlationId);
+					return await LibraryClientUtility.$store.requestOpenSource(correlationId);
 				},
 				async requestPlans(correlationId) {
-					return await GlobalUtility.$store.requestPlans(correlationId);
+					return await LibraryClientUtility.$store.requestPlans(correlationId);
 				},
 				async requestVersion(correlationId) {
-					await GlobalUtility.$store.requestVersion(correlationId);
+					await LibraryClientUtility.$store.requestVersion(correlationId);
 				},
 				async initialize(correlationId) {
-					await GlobalUtility.$store.initialize(correlationId);
+					await LibraryClientUtility.$store.initialize(correlationId);
 				}
 			}
 		};

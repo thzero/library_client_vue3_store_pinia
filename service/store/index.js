@@ -1,50 +1,50 @@
-import GlobalUtility from '@thzero/library_client/utility/global';
+import LibraryClientUtility from '@thzero/library_client/utility/index';
 
 import Service from '@thzero/library_client/service/index';
 
 class PiniaStoreService extends Service {
 	get dispatcher() {
-		return GlobalUtility.$store.dispatcher;
+		return LibraryClientUtility.$store.dispatcher;
 	}
 
 	get getters() {
-		return GlobalUtility.$store.getters;
+		return LibraryClientUtility.$store.getters;
 	}
 
 	get news() {
-		return GlobalUtility.$store.news;
+		return LibraryClientUtility.$store.news;
 	}
 
 	get state() {
-		return GlobalUtility.$store;
+		return LibraryClientUtility.$store;
 	}
 
 	get user() {
-		return GlobalUtility.$store.user.user;
+		return LibraryClientUtility.$store.user.user;
 	}
 	
 	get userClaims() {
-		return GlobalUtility.$store.user.claims;
+		return LibraryClientUtility.$store.user.claims;
 	}
 	
 	get userToken() {
-		return GlobalUtility.$store.user.token;
+		return LibraryClientUtility.$store.user.token;
 	}
 	
 	get userAuthCompleted() {
-		return GlobalUtility.$store.user.authCompleted;
+		return LibraryClientUtility.$store.user.authCompleted;
 	}
 	
 	get userAuthIsLoggedIn() {
-		return GlobalUtility.$store.user.isLoggedIn;
+		return LibraryClientUtility.$store.user.isLoggedIn;
 	}
 	
 	get userTheme() {
-		return GlobalUtility.$store.user.theme;
+		return LibraryClientUtility.$store.user.theme;
 	}
 	
 	get userTokenResult() {
-		return GlobalUtility.$store.user.tokenResult;
+		return LibraryClientUtility.$store.user.tokenResult;
 	}
 }
 
