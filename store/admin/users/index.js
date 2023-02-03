@@ -1,7 +1,7 @@
-import LibraryConstants from '@thzero/library_client/constants';
+import LibraryClientConstants from '@thzero/library_client/constants';
 
-import GlobalUtility from '@thzero/library_client/utility/global';
-import LibraryUtility from '@thzero/library_common/utility';
+import LibraryClientUtility from '@thzero/library_client/utility/index';
+import LibraryCommonUtility from '@thzero/library_common/utility';
 
 import Response from '@thzero/library_common/response';
 
@@ -11,18 +11,18 @@ const store = {
 	},
 	actions: {
 		async deleteAdminUser(correlationId, id) {
-			const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_ADMIN_USERS);
+			const service = LibraryClientUtility.$injector.getService(LibraryClientConstants.InjectorKeys.SERVICE_ADMIN_USERS);
 			const response = await service.delete(correlationId, id);
 			this.$logger.debug('store.admin.users', 'deleteAdminUser', 'response', response);
 			if (Response.hasSucceeded(response)) {
 				commit('deleteAdminUser', { correlationId: correlationId, id: id });
-				this.users = LibraryUtility.deleteArrayById(this.users, id);
-				GlobalUtility.$store.dispatcher.users.delete(correlationId, id);
+				this.users = LibraryCommonUtility.deleteArrayById(this.users, id);
+				LibraryClientUtility.$store.dispatcher.users.delete(correlationId, id);
 			}
 			return response;
 		},
 		async searchAdminUsers(correlationId, params) {
-			const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_ADMIN_USERS);
+			const service = LibraryClientUtility.$injector.getService(LibraryClientConstants.InjectorKeys.SERVICE_ADMIN_USERS);
 			const response = await service.search(correlationId, params);
 			this.$logger.debug('store.admin.users', 'searchAdminUsers', 'response', response);
 			if (Response.hasSucceeded(response)) {
@@ -34,14 +34,14 @@ const store = {
 			}
 		},
 		async updateAdminUser(correlationId, item) {
-			const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_ADMIN_USERS);
+			const service = LibraryClientUtility.$injector.getService(LibraryClientConstants.InjectorKeys.SERVICE_ADMIN_USERS);
 			const response = await service.update(correlationId, item);
 			this.$logger.debug('store.admin.users', 'updateAdminUser', 'response', response);
 			if (Response.hasSucceeded(response)) {
 				const item = response.results;
 				this.$logger.debug('store.admin.users', 'setAdminUsers', 'items.a', item, correlationId);
 				this.$logger.debug('store.admin.users', 'setAdminUsers', 'items.b', this.users, correlationId);
-				this.users = LibraryUtility.updateArrayById(this.users, item);
+				this.users = LibraryCommonUtility.updateArrayById(this.users, item);
 				this.$logger.debug('store.admin.users', 'setAdminUsers', 'items.c', this.users, correlationId);
 			}
 			return response;
@@ -49,13 +49,13 @@ const store = {
 	},
 	dispatcher: {
 		async deleteAdminUser(correlationId, id) {
-			return await GlobalUtility.$store.deleteAdminUser(correlationId, id);
+			return await LibraryClientUtility.$store.deleteAdminUser(correlationId, id);
 		},
 		async searchAdminUsers(correlationId, params) {
-			await GlobalUtility.$store.searchAdminUsers(correlationId, params);
+			await LibraryClientUtility.$store.searchAdminUsers(correlationId, params);
 		},
 		async updateAdminUser(correlationId, item) {
-			return await GlobalUtility.$store.updateAdminUser(correlationId, item);
+			return await LibraryClientUtility.$store.updateAdminUser(correlationId, item);
 		}
 	}
 };

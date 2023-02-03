@@ -1,6 +1,6 @@
-import LibraryConstants from '@thzero/library_client/constants';
+import LibraryClientConstants from '@thzero/library_client/constants';
 
-import GlobalUtility from '@thzero/library_client/utility/global';
+import LibraryClientUtility from '@thzero/library_client/utility/index';
 
 const store = {
 	pluginPersistPaths: {
@@ -13,7 +13,7 @@ const store = {
 	}),
 	actions: {
 		async getLatestNews(correlationId) {
-			const service = GlobalUtility.$injector.getService(LibraryConstants.InjectorKeys.SERVICE_NEWS);
+			const service = LibraryClientUtility.$injector.getService(LibraryClientConstants.InjectorKeys.SERVICE_NEWS);
 			const response = await service.latest(correlationId);
 			this.$logger.debug('store.news', 'getLatestNews', 'response', response);
 			// commit('setLatestNews', { correlationId: correlationId, latest: response.success && response.results ? response.results.data : null });
@@ -34,8 +34,8 @@ const store = {
 	},
 	dispatcher: {
 		async getLatest(correlationId) {
-			// await GlobalUtility.$store.dispatch('getLatestNews', correlationId);
-			await GlobalUtility.$store.news.getLatestNews(correlationId);
+			// await LibraryClientUtility.$store.dispatch('getLatestNews', correlationId);
+			await LibraryClientUtility.$store.news.getLatestNews(correlationId);
 		}
 	}
 };
