@@ -27,7 +27,7 @@ class BaseStore {
 	}
 
 	setup() {
-		const logger = LibraryClientUtility.$injector.getService(LibraryClientConstants.InjectorKeys.SERVICE_LOGGER);
+		// const logger = LibraryClientUtility.$injector.getService(LibraryClientConstants.InjectorKeys.SERVICE_LOGGER);
 
 		const initialStoreConfig = this._initStoreConfigBase();
 		const appStoreConfig = this._initStoreConfig();
@@ -44,10 +44,10 @@ class BaseStore {
 			func: {
 				install(app, options) {
 					const storeConfig = options.storeConfig;
-					
+
 					options.actionGetters = storeConfig.getters;
 					options.actionDispatcher = storeConfig.dispatcher;
-					if (!options.actionDispatcher) 
+					if (!options.actionDispatcher)
 						options.actionDispatcher = {};
 
 					const pluginPersistType = options.pluginPersistType();
@@ -57,20 +57,29 @@ class BaseStore {
 						options.pluginPersistSetup(pluginPersistType, storeConfig, options.pluginPersistConfig[pluginPersistType], options.pluginPersistSetupOverride, {
 							additionalPaths: additionalPaths
 						});
-						
+
 					// if (storeConfig.pluginPersistPaths && storeConfig.pluginPersistPaths[pluginPersistType])
 					// 	storeConfig[pluginPersistType].paths = [ ...storeConfig[pluginPersistType].paths, ...storeConfig.pluginPersistPaths[pluginPersistType] ];
 					delete storeConfig.pluginPersistPaths;
 
 					const storeFunc = defineStore('main', storeConfig);
 					LibraryClientUtility.$store = storeFunc(options.pinia);
-					LibraryClientUtility.$store.$logger = options.logger;
+					//LibraryClientUtility.$store.$logger = options.logger;
+					Object.defineProperty(LibraryClientUtility.$store, '$logger', {
+						get() {
+							if (!this._logger)
+								this._logger = LibraryClientUtility.$injector.getService(LibraryClientConstants.InjectorKeys.SERVICE_LOGGER);
+							return this._logger;
+						},
+					  });
 
 					const storeFuncModules = [];
 					// options.addModule('adminNews', adminNews, options.actionDispatcher, pluginPersistType, options.pluginPersistConfig, options.pinia, logger);
 					// options.addModule('adminUsers', adminUsers, options.actionDispatcher, pluginPersistType, options.pluginPersistConfig, options.pinia, logger);
-					storeFuncModules.push(options.addModule('news', news, options.actionDispatcher, options.actionGetters, storeConfig.persist, pluginPersistType, options.pluginPersistSetup, options.pluginPersistSetupOverride, options.pinia, logger));
-					storeFuncModules.push(options.addModule('user', user, options.actionDispatcher, options.actionGetters, storeConfig.persist, pluginPersistType, options.pluginPersistSetup, options.pluginPersistSetupOverride, options.pinia, logger));
+					// storeFuncModules.push(options.addModule('news', news, options.actionDispatcher, options.actionGetters, storeConfig.persist, pluginPersistType, options.pluginPersistSetup, options.pluginPersistSetupOverride, options.pinia, logger));
+					// storeFuncModules.push(options.addModule('user', user, options.actionDispatcher, options.actionGetters, storeConfig.persist, pluginPersistType, options.pluginPersistSetup, options.pluginPersistSetupOverride, options.pinia, logger));
+					storeFuncModules.push(options.addModule('news', news, options.actionDispatcher, options.actionGetters, storeConfig.persist, pluginPersistType, options.pluginPersistSetup, options.pluginPersistSetupOverride, options.pinia));
+					storeFuncModules.push(options.addModule('user', user, options.actionDispatcher, options.actionGetters, storeConfig.persist, pluginPersistType, options.pluginPersistSetup, options.pluginPersistSetupOverride, options.pinia));
 
 					storeFuncModules.push(...options.initModules());
 
@@ -83,7 +92,7 @@ class BaseStore {
 				actionGetters: this.actionGetters,
 				addModule: this._addModule,
 				initModules: this._initModules,
-				logger: logger,
+				// logger: logger,
 				pinia: this.pinia,
 				pluginPersistConfig: this._initPluginPersistConfig(),
 				pluginPersistSetupOverride: this._initPluginPersistConfigSetupOverride,
@@ -94,7 +103,8 @@ class BaseStore {
 		};
 	}
 
-	_addModule(key, storeConfig, actionDispatcher, actionGetters, pluginPersistConfig, pluginPersistType, pluginPersistSetup, pluginPersistSetupOverride, pinia, logger) {
+	// _addModule(key, storeConfig, actionDispatcher, actionGetters, pluginPersistConfig, pluginPersistType, pluginPersistSetup, pluginPersistSetupOverride, pinia, logger) {
+		_addModule(key, storeConfig, actionDispatcher, actionGetters, pluginPersistConfig, pluginPersistType, pluginPersistSetup, pluginPersistSetupOverride, pinia) {
 		if (pluginPersistType && pluginPersistSetup && storeConfig.pluginPersistPaths && storeConfig.pluginPersistPaths[pluginPersistType]) {
 			pluginPersistConfig = LibraryCommonUtility.cloneDeep(pluginPersistConfig);
 			pluginPersistSetup(pluginPersistType, storeConfig, pluginPersistConfig, pluginPersistSetupOverride, {
@@ -109,7 +119,14 @@ class BaseStore {
 		delete storeConfig.pluginPersistPaths;
 		const storeFunc = defineStore(key, storeConfig);
 		LibraryClientUtility.$store[key] = storeFunc(pinia);
-		LibraryClientUtility.$store[key].$logger = logger;
+		// LibraryClientUtility.$store[key].$logger = logger;
+		Object.defineProperty(LibraryClientUtility.$store[key], '$logger', {
+			get() {
+				if (!this._logger)
+					this._logger = LibraryClientUtility.$injector.getService(LibraryClientConstants.InjectorKeys.SERVICE_LOGGER);
+				return this._logger;
+			},
+		});
 		return { key: key, storeFunc: storeFunc };
 	}
 
