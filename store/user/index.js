@@ -8,6 +8,7 @@ import Response from '@thzero/library_common/response';
 const store = {
 	pluginPersistPaths: {
 		persist: [
+			'settings',
 			'user'
 		]
 	},
@@ -15,6 +16,7 @@ const store = {
 		authCompleted: false,
 		claims: null,
 		isLoggedIn: false,
+		settings: {},
 		theme: 'defaultTheme',
 		token: null,
 		tokenResult: null,
@@ -35,8 +37,16 @@ const store = {
 				isLoggedIn: false,
 				token: null,
 				tokenResult: null,
+				settings: {},
 				user: null
 			});
+		},
+		async setUser(correlationId, user) {
+			if (user) {
+				this.settings = LibraryClientVueUtility.settings().mergeUser(correlationId, user.settings);
+				delete user.settings;
+			}
+			this.user = user;
 		},
 		async setUserAuthCompleted(correlationId, authCompleted) {
 			this.authCompleted = authCompleted;
@@ -50,11 +60,21 @@ const store = {
 		async setUserSettings(correlationId, settings) {
 			const service = LibraryClientUtility.$injector.getService(LibraryClientConstants.InjectorKeys.SERVICE_USER);
 			settings = LibraryClientVueUtility.settings().mergeUser(correlationId, settings);
-			const response = await service.updateSettings(correlationId, this.user, settings);
-			this.$logger.debug('store.user', 'setUserSettings', 'response', response);
-			if (Response.hasSucceeded(response) && response.results)
-				this.user = response.results;
-			return response;
+			if (this.isLoggedIn) {
+				const response = await service.updateSettings(correlationId, this.user, settings);
+				this.$logger.debug('store.user', 'setUserSettings', 'response', response);
+				if (Response.hasSucceeded(response) && response.results) {
+					// this.settings = response.results.settings;
+					// delete response.results.settings;
+					// this.user = response.results;
+					// response.results = this.settings;
+					this.setUser(correlationId, response.results);
+					response.results = this.settings;
+				}
+				return response;
+			}
+			this.settings = LibraryClientVueUtility.settings().mergeUser(correlationId, settings);
+			return Response.success(correlationId, this.settings);
 		},
 		async setUserTheme(correlationId, isLoggedIn) {
 			this.theme = theme;
@@ -64,11 +84,6 @@ const store = {
 				tokenResult: null,
 				token: tokenResult ? tokenResult.token : null
 			});
-		},
-		async setUser(correlationId, user) {
-			if (user)
-				user.settings = LibraryClientVueUtility.settings().mergeUser(correlationId, user.settings);
-			this.user = user;
 		}
 	},
 	getters: {
@@ -79,8 +94,8 @@ const store = {
 			return LibraryClientUtility.$store.theme;
 		},
 		getUserSettings(correlationId) {
-			if (LibraryClientUtility.$store.user.user && LibraryClientUtility.$store.user.user.settings) // TODO: userRef
-				return LibraryClientUtility.$store.user.user.settings;
+			if (LibraryClientUtility.$store.user.settings) // TODO: userRef
+				return LibraryClientUtility.$store.user.settings;
 
 			const service = LibraryClientUtility.$injector.getService(LibraryClientConstants.InjectorKeys.SERVICE_USER);
 			return service.initializeSettings();
