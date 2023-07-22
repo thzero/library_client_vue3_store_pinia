@@ -18,7 +18,7 @@ const store = {
 				const item = response.success && response.results ? response.results : null;
 				this.$logger.debug('store.admin.news', 'setAdminNews', 'items.a', item, correlationId);
 				this.$logger.debug('store.admin.news', 'setAdminNews', 'items.b', this.news, correlationId);
-				this.news = LibraryCommonUtility.updateArrayById(this.news, item);
+				this.news = LibraryCommonUtility.updateArrayByObject(this.news, item);
 				this.$logger.debug('store.admin.news', 'setAdminNews', 'items.c', this.news, correlationId);
 			}
 			return response;
@@ -51,7 +51,7 @@ const store = {
 				const item = response.success && response.results ? response.results : null;
 				this.$logger.debug('store.admin.news', 'setAdminNews', 'items.a', item, correlationId);
 				this.$logger.debug('store.admin.news', 'setAdminNews', 'items.b', this.news, correlationId);
-				this.news = LibraryCommonUtility.updateArrayById(this.news, item);
+				this.news = LibraryCommonUtility.updateArrayByObject(this.news, item);
 				this.$logger.debug('store.admin.news', 'setAdminNews', 'items.c', this.news, correlationId);
 			}
 			return response;
