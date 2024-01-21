@@ -273,6 +273,8 @@ class BaseStore {
 					this.$logger.debug('store', 'setPlans', 'plans.c', this.plans, correlationId);
 				},
 				async setVersion(correlationId, version) {
+					if (!version)
+						return;
 					// this.$logger.debug('store', 'getVersion', 'version', version, correlationId);
 					// commit('setVersion', { correlationId: correlationId, version: version });
 					this.$logger.debug('store', 'setVersion', 'version', version, correlationId);
