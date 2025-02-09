@@ -1,10 +1,10 @@
 {
   "name": "@thzero/library_client_vue3_store_pinia",
-  "version": "0.18.11",
+  "version": "0.18.12",
   "version_major": 0,
   "version_minor": 18,
-  "version_patch": 11,
-  "version_date": "01/05/2025",
+  "version_patch": 12,
+  "version_date": "02/09/2025",
   "description": "An opinionated library for vue3 with pinia store for the library_client_vue3 using the https://prazdevs.github.io/pinia-plugin-persistedstate library.",
   "author": "thZero",
   "license": "MIT",
@@ -20,7 +20,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "pinia": "^2.3.0",
+    "pinia": "^2.3.1",
     "pinia-plugin-persistedstate": "^4.2.0",
     "pinia-plugin-persistedstate-2": "^2.0.28",
     "vue": "^3.5.13"
