@@ -174,7 +174,7 @@ class BaseStore {
 			if (options && !String.isNullOrEmpty(options.keySuffix))
 				persistConfig.key += options.keySuffix;
 			if (options && options.additionalPaths)
-				persistConfig.paths = [ ...persistConfig.paths, ...options.additionalPaths ];
+				persistConfig.pick = [ ...persistConfig.paths, ...options.additionalPaths ];
 			storeConfig.persist = persistConfig;
 			return;
 		}
