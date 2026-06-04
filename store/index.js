@@ -78,10 +78,12 @@ class BaseStore {
 					// options.addModule('adminUsers', adminUsers, options.actionDispatcher, pluginPersistType, options.pluginPersistConfig, options.pinia, logger);
 					// storeFuncModules.push(options.addModule('news', news, options.actionDispatcher, options.actionGetters, storeConfig.persist, pluginPersistType, options.pluginPersistSetup, options.pluginPersistSetupOverride, options.pinia, logger));
 					// storeFuncModules.push(options.addModule('user', user, options.actionDispatcher, options.actionGetters, storeConfig.persist, pluginPersistType, options.pluginPersistSetup, options.pluginPersistSetupOverride, options.pinia, logger));
-					storeFuncModules.push(options.addModule('news', news, options.actionDispatcher, options.actionGetters, storeConfig.persist, pluginPersistType, options.pluginPersistSetup, options.pluginPersistSetupOverride, options.pinia));
-					storeFuncModules.push(options.addModule('user', user, options.actionDispatcher, options.actionGetters, storeConfig.persist, pluginPersistType, options.pluginPersistSetup, options.pluginPersistSetupOverride, options.pinia));
+					storeFuncModules.push(options.initModule('news', news, options.actionDispatcher, options.actionGetters, storeConfig.persist, pluginPersistType, options.pluginPersistSetup, options.pluginPersistSetupOverride, options.pinia));
+					storeFuncModules.push(options.initModule('user', user, options.actionDispatcher, options.actionGetters, storeConfig.persist, pluginPersistType, options.pluginPersistSetup, options.pluginPersistSetupOverride, options.pinia));
 
-					storeFuncModules.push(...options.initModules());
+					const modules = options.initModules(options.addModule);
+					for(const module of modules)
+						storeFuncModules.push(options.initModule(module.key, module.storeConfig, options.actionDispatcher, options.actionGetters, storeConfig.persist, pluginPersistType, options.pluginPersistSetup, options.pluginPersistSetupOverride, options.pinia));
 
 					LibraryClientUtility.$store.dispatcher = options.actionDispatcher;
 					LibraryClientUtility.$store.getters = options.actionGetters;
@@ -91,6 +93,7 @@ class BaseStore {
 				actionDispatcher: this.actionDispatcher,
 				actionGetters: this.actionGetters,
 				addModule: this._addModule,
+				initModule: this._initModule,
 				initModules: this._initModules,
 				// logger: logger,
 				pinia: this.pinia,
@@ -103,8 +106,12 @@ class BaseStore {
 		};
 	}
 
+	_addModule(key, storeConfig) {
+		return { key: key, storeConfig: storeConfig };
+	}
+
 	// _addModule(key, storeConfig, actionDispatcher, actionGetters, pluginPersistConfig, pluginPersistType, pluginPersistSetup, pluginPersistSetupOverride, pinia, logger) {
-		_addModule(key, storeConfig, actionDispatcher, actionGetters, pluginPersistConfig, pluginPersistType, pluginPersistSetup, pluginPersistSetupOverride, pinia) {
+	_initModule(key, storeConfig, actionDispatcher, actionGetters, pluginPersistConfig, pluginPersistType, pluginPersistSetup, pluginPersistSetupOverride, pinia) {
 		if (pluginPersistType && pluginPersistSetup && storeConfig.pluginPersistPaths && storeConfig.pluginPersistPaths[pluginPersistType]) {
 			pluginPersistConfig = LibraryCommonUtility.cloneDeep(pluginPersistConfig);
 			pluginPersistSetup(pluginPersistType, storeConfig, pluginPersistConfig, pluginPersistSetupOverride, {
@@ -130,10 +137,6 @@ class BaseStore {
 		return { key: key, storeFunc: storeFunc };
 	}
 
-	_initModules() {
-		return [];
-	}
-
 	_initPluginPersist() {
 		if (this._initPluginPersistType() === BaseStore.PersistanceTypePersist) {
 			this.pinia.use(piniaPluginPersistedState);
@@ -153,6 +156,10 @@ class BaseStore {
 		}
 
 		throw Error('Unknown persistance engine for Pinia store.');
+	}
+
+	_initModules() {
+		return null;
 	}
 
 	_initPluginPersistConfig() {
