@@ -1,6 +1,5 @@
 import { createPinia, defineStore } from 'pinia';
 import piniaPluginPersistedState from 'pinia-plugin-persistedstate';
-import { createPersistedStatePlugin } from 'pinia-plugin-persistedstate-2';
 
 import LibraryClientConstants from '@thzero/library_client/constants';
 
@@ -142,11 +141,12 @@ class BaseStore {
 			this.pinia.use(piniaPluginPersistedState);
 			return;
 		}
-		if (this._initPluginPersistType() === BaseStore.PersistanceTypePersist2) {
-			const installPersistedStatePlugin = createPersistedStatePlugin();
-			this.pinia.use((context) => installPersistedStatePlugin(context));
-			return;
-		}
+		// TODO: Not currently supports Pinina 4
+		// if (this._initPluginPersistType() === BaseStore.PersistanceTypePersist2) {
+		// 	const installPersistedStatePlugin = createPersistedStatePlugin();
+		// 	this.pinia.use((context) => installPersistedStatePlugin(context));
+		// 	return;
+		// }
 		if (this._initPluginPersistType() === BaseStore.PersistanceTypeOverride) {
 			const override = this._initPluginPersistOverride();
 			if (override) {
@@ -185,16 +185,17 @@ class BaseStore {
 			storeConfig.persist = persistConfig;
 			return;
 		}
-		if (type === BaseStore.PersistanceTypePersist2) {
-			if (options && !String.isNullOrEmpty(options.keyOverride))
-				persistConfig.key = options.keyOverride;
-			if (options && !String.isNullOrEmpty(options.keySuffix))
-				persistConfig.key += options.keySuffix;
-			if (options && options.additionalPaths)
-				persistConfig.includePaths = [ ...persistConfig.includePaths, ...options.additionalPaths ];
-			storeConfig.persistedState = persistConfig;
-			return;
-		}
+		// TODO: Not currently supports Pinina 4
+		// if (type === BaseStore.PersistanceTypePersist2) {
+		// 	if (options && !String.isNullOrEmpty(options.keyOverride))
+		// 		persistConfig.key = options.keyOverride;
+		// 	if (options && !String.isNullOrEmpty(options.keySuffix))
+		// 		persistConfig.key += options.keySuffix;
+		// 	if (options && options.additionalPaths)
+		// 		persistConfig.includePaths = [ ...persistConfig.includePaths, ...options.additionalPaths ];
+		// 	storeConfig.persistedState = persistConfig;
+		// 	return;
+		// }
 		if (type === BaseStore.PersistanceTypeOverride) {
 			if (override) {
 				override(storeConfig, persistConfig);
