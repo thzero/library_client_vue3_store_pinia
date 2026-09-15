@@ -294,7 +294,7 @@ class BaseStore {
 					return LibraryClientUtility.$store.openSource;
 				},
 				getPlan(correlationId, id) {
-					if (LibraryClientUtility.$store.plans == null)
+					if (LibraryCommonUtility.isNull(LibraryClientUtility.$store.plans))
 						return null;
 					return LibraryClientUtility.$store.plans.find(plan => plan.id === id);
 				}
