@@ -155,7 +155,7 @@ class BaseStore {
 			}
 		}
 
-		throw Error('Unknown persistance engine for Pinia store.');
+		throw new Error('Unknown persistance engine for Pinia store.');
 	}
 
 	_initModules() {
@@ -203,7 +203,7 @@ class BaseStore {
 			}
 		}
 
-		throw Error('Unknown persistance engine for Pinia store.');
+		throw new Error('Unknown persistance engine for Pinia store.');
 	}
 
 	_initPluginPersistConfigSetupOverride(storeConfig, persistConfig) {

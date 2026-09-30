@@ -16,10 +16,10 @@ const store = {
 			this.$logger.debug('store.admin.news', 'createAdminNews', 'response', response);
 			if (Response.hasSucceeded(response)) {
 				const item = response.success && response.results ? response.results : null;
-				this.$logger.debug('store.admin.news', 'setAdminNews', 'items.a', item, correlationId);
-				this.$logger.debug('store.admin.news', 'setAdminNews', 'items.b', this.news, correlationId);
+				this.$logger.debug('store.admin.news', 'createAdminNews', 'items.a', item, correlationId);
+				this.$logger.debug('store.admin.news', 'createAdminNews', 'items.b', this.news, correlationId);
 				this.news = LibraryCommonUtility.updateArrayByObject(this.news, item);
-				this.$logger.debug('store.admin.news', 'setAdminNews', 'items.c', this.news, correlationId);
+				this.$logger.debug('store.admin.news', 'createAdminNews', 'items.c', this.news, correlationId);
 			}
 			return response;
 		},
@@ -38,10 +38,10 @@ const store = {
 			const response = await service.search(correlationId, params);
 			this.$logger.debug('store.admin.news', 'searchAdminNews', 'response', response);
 			const list = response.success && response.results ? response.results.data : null;
-			this.$logger.debug('store.admin.news', 'setAdminNewsListing', 'list.a', list, correlationId);
-			this.$logger.debug('store.admin.news', 'setAdminNewsListing', 'list.b', this.news, correlationId);
+			this.$logger.debug('store.admin.news', 'searchAdminNews', 'list.a', list, correlationId);
+			this.$logger.debug('store.admin.news', 'searchAdminNews', 'list.b', this.news, correlationId);
 			this.news = list;
-			this.$logger.debug('store.admin.news', 'setAdminNewsListing', 'list.c', this.news, correlationId);
+			this.$logger.debug('store.admin.news', 'searchAdminNews', 'list.c', this.news, correlationId);
 		},
 		async updateAdminNews(correlationId, item) {
 			const service = LibraryClientUtility.$injector.getService(LibraryClientConstants.InjectorKeys.SERVICE_ADMIN_NEWS);
@@ -49,10 +49,10 @@ const store = {
 			this.$logger.debug('store.admin.news', 'updateAdminNews', 'response', response);
 			if (Response.hasSucceeded(response)) {
 				const item = response.success && response.results ? response.results : null;
-				this.$logger.debug('store.admin.news', 'setAdminNews', 'items.a', item, correlationId);
-				this.$logger.debug('store.admin.news', 'setAdminNews', 'items.b', this.news, correlationId);
+				this.$logger.debug('store.admin.news', 'updateAdminNews', 'items.a', item, correlationId);
+				this.$logger.debug('store.admin.news', 'updateAdminNews', 'items.b', this.news, correlationId);
 				this.news = LibraryCommonUtility.updateArrayByObject(this.news, item);
-				this.$logger.debug('store.admin.news', 'setAdminNews', 'items.c', this.news, correlationId);
+				this.$logger.debug('store.admin.news', 'updateAdminNews', 'items.c', this.news, correlationId);
 			}
 			return response;
 		}

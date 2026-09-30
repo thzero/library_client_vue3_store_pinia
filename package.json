@@ -1,5 +1,6 @@
 {
   "name": "@thzero/library_client_vue3_store_pinia",
+  "type": "module",
   "version": "0.18.39",
   "version_major": 0,
   "version_minor": 18,

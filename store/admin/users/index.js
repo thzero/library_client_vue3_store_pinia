@@ -27,10 +27,10 @@ const store = {
 			this.$logger.debug('store.admin.users', 'searchAdminUsers', 'response', response);
 			if (Response.hasSucceeded(response)) {
 				const list = response.success && response.results ? response.results.data : null;
-				this.$logger.debug('store.admin.users', 'setAdminUsersListing', 'list.a', list, correlationId);
-				this.$logger.debug('store.admin.users', 'setAdminUsersListing', 'list.b', this.users, correlationId);
+				this.$logger.debug('store.admin.users', 'searchAdminUsers', 'list.a', list, correlationId);
+				this.$logger.debug('store.admin.users', 'searchAdminUsers', 'list.b', this.users, correlationId);
 				this.users = list;
-				this.$logger.debug('store.admin.users', 'setAdminUsersListing', 'list.c', this.users, correlationId);
+				this.$logger.debug('store.admin.users', 'searchAdminUsers', 'list.c', this.users, correlationId);
 			}
 		},
 		async updateAdminUser(correlationId, item) {
@@ -39,10 +39,10 @@ const store = {
 			this.$logger.debug('store.admin.users', 'updateAdminUser', 'response', response);
 			if (Response.hasSucceeded(response)) {
 				const item = response.results;
-				this.$logger.debug('store.admin.users', 'setAdminUsers', 'items.a', item, correlationId);
-				this.$logger.debug('store.admin.users', 'setAdminUsers', 'items.b', this.users, correlationId);
+				this.$logger.debug('store.admin.users', 'updateAdminUser', 'items.a', item, correlationId);
+				this.$logger.debug('store.admin.users', 'updateAdminUser', 'items.b', this.users, correlationId);
 				this.users = LibraryCommonUtility.updateArrayById(this.users, item);
-				this.$logger.debug('store.admin.users', 'setAdminUsers', 'items.c', this.users, correlationId);
+				this.$logger.debug('store.admin.users', 'updateAdminUser', 'items.c', this.users, correlationId);
 			}
 			return response;
 		}

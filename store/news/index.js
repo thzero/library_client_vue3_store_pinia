@@ -18,10 +18,10 @@ const store = {
 			this.$logger.debug('store.news', 'getLatestNews', 'response', response);
 			// commit('setLatestNews', { correlationId: correlationId, latest: response.success && response.results ? response.results.data : null });
 			const latest = response.success && response.results ? response.results.data : null;
-			this.$logger.debug('store.news', 'setLatest', 'item.a', latest, correlationId);
-			this.$logger.debug('store.news', 'setLatest', 'item.b', this.latest, correlationId);
+			this.$logger.debug('store.news', 'getLatestNews', 'item.a', latest, correlationId);
+			this.$logger.debug('store.news', 'getLatestNews', 'item.b', this.latest, correlationId);
 			this.latest = latest;
-			this.$logger.debug('store.news', 'setLatest', 'item.c', this.latest, correlationId);
+			this.$logger.debug('store.news', 'getLatestNews', 'item.c', this.latest, correlationId);
 		}
 	},
 	mutations: {
