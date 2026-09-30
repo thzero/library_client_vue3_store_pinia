@@ -27,8 +27,10 @@ const store = {
 			const service = LibraryClientUtility.$injector.getService(LibraryClientConstants.InjectorKeys.SERVICE_USER);
 			const response = await service.refreshSettings(correlationId, this.user);
 			this.$logger.debug('store.user', 'refreshUserSettings', 'response', response);
+			// setUser(correlationId, user): without the correlationId the user was
+			// set to undefined
 			if (Response.hasSucceeded(response) && response.results)
-				this.setUser(response.results);
+				await this.setUser(correlationId, response.results);
 			return response;
 		},
 		async resetUser(correlationId) {
@@ -76,12 +78,12 @@ const store = {
 			this.settings = LibraryClientVueUtility.settings().mergeUser(correlationId, settings);
 			return Response.success(correlationId, this.settings);
 		},
-		async setUserTheme(correlationId, isLoggedIn) {
+		async setUserTheme(correlationId, theme) {
 			this.theme = theme;
 		},
 		async setUserTokenResult(correlationId, tokenResult) {
 			this.$patch({
-				tokenResult: null,
+				tokenResult: tokenResult ?? null,
 				token: tokenResult ? tokenResult.token : null
 			});
 		}
@@ -91,7 +93,8 @@ const store = {
 			return LibraryClientUtility.$store.user.user;
 		},
 		getUserTheme (correlationId) {
-			return LibraryClientUtility.$store.theme;
+			// theme lives on the user module, not the root store
+			return LibraryClientUtility.$store.user.theme;
 		},
 		getUserSettings(correlationId) {
 			if (LibraryClientUtility.$store.user.settings) // TODO: userRef
