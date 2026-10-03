@@ -155,11 +155,13 @@ class BaseStore {
 			}
 		}
 
-		throw Error('Unknown persistance engine for Pinia store.');
+		throw new Error('Unknown persistance engine for Pinia store.');
 	}
 
 	_initModules() {
-		return null;
+		// an empty list, not null: install iterates it, and an app that does not
+		// override this crashed while the store installed
+		return [];
 	}
 
 	_initPluginPersistConfig() {
@@ -180,8 +182,10 @@ class BaseStore {
 				persistConfig.key = options.keyOverride;
 			if (options && !String.isNullOrEmpty(options.keySuffix))
 				persistConfig.key += options.keySuffix;
+			// pinia-plugin-persistedstate 4 reads `pick`; 3 read `paths`. Take the
+			// app's list from either, so a config written for 4 does not throw here.
 			if (options && options.additionalPaths)
-				persistConfig.pick = [ ...persistConfig.paths, ...options.additionalPaths ];
+				persistConfig.pick = [ ...(persistConfig.paths ?? persistConfig.pick ?? []), ...options.additionalPaths ];
 			storeConfig.persist = persistConfig;
 			return;
 		}
@@ -203,7 +207,7 @@ class BaseStore {
 			}
 		}
 
-		throw Error('Unknown persistance engine for Pinia store.');
+		throw new Error('Unknown persistance engine for Pinia store.');
 	}
 
 	_initPluginPersistConfigSetupOverride(storeConfig, persistConfig) {
@@ -261,7 +265,8 @@ class BaseStore {
 					if (Response.hasFailed(response))
 						return response;
 					await this.setPlans(correlationId, plans);
-					return Response.success(plans);
+					// Response.success(correlationId, results); the plans used to go in the correlationId slot
+					return Response.success(correlationId, plans);
 				},
 				async requestVersion(correlationId) {
 					const service = LibraryClientUtility.$injector.getService(LibraryClientConstants.InjectorKeys.SERVICE_VERSION);
@@ -294,7 +299,7 @@ class BaseStore {
 					return LibraryClientUtility.$store.openSource;
 				},
 				getPlan(correlationId, id) {
-					if (LibraryClientUtility.$store.plans == null)
+					if (LibraryCommonUtility.isNull(LibraryClientUtility.$store.plans))
 						return null;
 					return LibraryClientUtility.$store.plans.find(plan => plan.id === id);
 				}
