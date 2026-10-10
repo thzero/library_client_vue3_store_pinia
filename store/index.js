@@ -60,6 +60,11 @@ class BaseStore {
 					// if (storeConfig.pluginPersistPaths && storeConfig.pluginPersistPaths[pluginPersistType])
 					// 	storeConfig[pluginPersistType].paths = [ ...storeConfig[pluginPersistType].paths, ...storeConfig.pluginPersistPaths[pluginPersistType] ];
 					delete storeConfig.pluginPersistPaths;
+					// as _initModule does: the getters and dispatcher are kept above and
+					// set on the store below; left in, pinia made each getter a readonly
+					// computed on the store, which hid an action of the same name
+					delete storeConfig.dispatcher;
+					delete storeConfig.getters;
 
 					const storeFunc = defineStore('main', storeConfig);
 					LibraryClientUtility.$store = storeFunc(options.pinia);
